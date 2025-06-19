@@ -90,9 +90,12 @@ func spaceString(raw string) (out string) {
 }
 
 func script_command(bin string, flags []string) {
-	tool_path := filepath.Abs(fmt.Sprintf("%s/module/%s/tool", bin, flags[0]))
+	tool_path, err := filepath.Abs(fmt.Sprintf("%s/module/%s/tool", bin, flags[0]))
+	if err != nil {
+		log.Fatal("Error getting absolute path:", err)
+	}
 
-	_, err := os.Stat(tool_path)
+	_, err = os.Stat(tool_path)
 	if os.IsNotExist(err) {
 		usage()
 	}
@@ -236,7 +239,10 @@ func addtool(bin, toolpath, description string) {
 func main() {
 	flag.Parse()
 	file, _ := exec.LookPath(os.Args[0])
-	filepaths, _ := filepath.Abs(file)
+	filepaths, err := filepath.Abs(file)
+	if err != nil {
+		log.Fatal("Error getting absolute path:", err)
+	}
 	bin := filepath.Dir(filepaths)
 	
 	switch len(flag.Args()) {
