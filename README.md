@@ -90,8 +90,7 @@ export scriptpath=$(cd `dirname $0`; pwd)/tool.py
 /path/python3 $scriptpath "$@"
 ```
 
-tool文件里请包含python、Rscript、make或perl这种语言解释器，**"$@"**这种写法会把脚本需要的参数做正确的传递。
-
+tool文件里请包含python、Rscript、make或perl这种语言解释器，`"$@"`这种写法会把脚本需要的参数做正确的传递。
 
 #### 3. 实际工具脚本
 实际的工具逻辑可以写在任何脚本文件中，常见的有：
@@ -101,28 +100,7 @@ tool文件里请包含python、Rscript、make或perl这种语言解释器，**"$
 - `tool.mk`: makefile 脚本，默认调用makefile脚本的**main**模块
 - 其他任何可执行脚本
 
-**示例 `tool.py`：**
-```python
-#!/usr/bin/env python3
-import sys
-
-def main():
-    print("Hello from Python tool!")
-    if len(sys.argv) > 1:
-        print(f"Arguments: {sys.argv[1:]}")
-
-if __name__ == "__main__":
-    main()
-```
-
 #### 4. 工具目录示例
-
-**Python 工具示例：**
-```
-my-python-tool/
-├── tool              # 入口文件
-└── tool.py           # Python 脚本
-```
 
 ## 配置文件
 
@@ -139,6 +117,11 @@ tool2: "Description of tool2"
 
 ### 添加一个 R 脚本工具
 
+deseq2/
+├── tool              # 入口文件
+└── tool.R            # Rscript 脚本
+```
+
 1. 创建工具目录：
 **目录名称即是工具名称**
 
@@ -149,17 +132,12 @@ mkdir -p deseq2
 2. 创建可执行脚本：tool
 ```bash
 #!/bin/bash
-# my-shell-tool/tool
+# deseq2/tool
 export scriptpath=$(cd `dirname $0`; pwd)/tool.R
 /path/Rscript $scriptpath "$@"
 ```
 
-3. 设置执行权限：
-```bash
-chmod +x deseq2/tool
-```
-
-4. 编写tool.R：
+3. 编写tool.R：
 ```R
 args = commandArgs(T)
 
@@ -173,20 +151,19 @@ dds = DESeq(ddsFullCountTable)
 res = results(dds , contrast = c("condition",cmp[1], cmp[2]))
 
 out_file_name = paste(cmp_raw[1], cmp_raw[2], "transcript.xls", sep="_")
-
 write.table(res, file=out_file_name, sep="\t", quote = FALSE, row.names = TRUE)
 ```
 
-5. 添加到 stools：
+4. 添加到 stools：
 ```bash
 ./stools add ./deseq2 "A simple R tool"
 ```
 
-6. 执行工具：
+5. 执行工具：
 ```bash
 ./stools deseq2
-./stools deseq2 -arg1 value1 -arg2 value2
-./stools deseq2 arg arg2
+./stools deseq2 counts.tsv desisn.txt Case,Ctl
+# 其实相当于执行了 Rscript tool.R counts.tsv desisn.txt Case,Ctl
 ```
 
 ### 添加一个 makefile 脚本工具
@@ -204,12 +181,7 @@ export scriptpath=$(cd `dirname $0`; pwd)/tool.mk
 make -f $scriptpath "$@"
 ```
 
-3. 设置执行权限：
-```bash
-chmod +x my-make-tool/tool
-```
-
-4. 编写tool.mk：
+3. 编写tool.mk：
 ```makefile
 help:
     @echo -e "Makefile 功能:"
@@ -241,9 +213,15 @@ dowork:
 Main:checkPara makeshell dowork
 ```
 
-5. 添加到 stools：
+4. 添加到 stools：
 ```bash
 ./stools add ./my-shell-tool "A simple Shell tool"
+```
+
+5. 执行工具：
+```bash
+./stools my-shell-tool
+./stools my-shell-tool SPI=pm-xxx-01 SAMPLE=Case outdir=/path/outdir
 ```
 
 ## 注意事项
