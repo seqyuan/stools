@@ -116,7 +116,7 @@ tool2: "Description of tool2"
 ## 示例
 
 ### 添加一个 R 脚本工具
-
+```
 deseq2/
 ├── tool              # 入口文件
 └── tool.R            # Rscript 脚本

@@ -190,6 +190,11 @@ func addtool(bin, toolpath, description string) {
 		log.Fatal("toolpath not exists")
 	}
 	
+	_, err = os.Stat(fmt.Sprintf("%s/module", bin))
+	if os.IsNotExist(err) {
+		os.MkdirAll(fmt.Sprintf("%s/module", bin), 0755)
+	}
+
 	toolname := filepath.Base(toolpath)
 	if _, err := os.Stat(fmt.Sprintf("%s/module/%s", bin, toolname)); err == nil {
 		os.RemoveAll(fmt.Sprintf("%s/module/%s", bin, toolname))
