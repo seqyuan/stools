@@ -200,7 +200,7 @@ func addtool(bin, toolpath, description string) {
 		os.RemoveAll(fmt.Sprintf("%s/module/%s", bin, toolname))
 	}
 	
-	cp_cmd := fmt.Sprintf("cp -r %s %s/module/%s", toolpath, bin, toolname)
+	cp_cmd := fmt.Sprintf("cp -rL %s %s/module/%s", toolpath, bin, toolname)
 	run_cmd(cp_cmd)
 
 	// 给 tool 文件增加可执行权限
