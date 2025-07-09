@@ -46,15 +46,10 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.0.5"))
+	fmt.Println(fmt.Sprintf("version: 1.0.8"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
-	
-	if _, err := os.Stat("conf.yaml"); os.IsNotExist(err) {
-		os.Exit(1)
-	}
-	fmt.Println("\nAvailable tools:")
 	
 	// 读取 conf.yaml 文件
 	file, _ := exec.LookPath(os.Args[0])
@@ -62,6 +57,11 @@ func usage() {
 	bin := filepath.Dir(filepaths)
 	confPath := filepath.Join(bin, "conf.yaml")
 	
+	if _, err := os.Stat(confPath); os.IsNotExist(err) {
+		os.Exit(1)
+	}
+	fmt.Println("\nAvailable tools:")
+
 	// 读取 YAML 文件
 	data, err := os.ReadFile(confPath)
 	if err != nil {
