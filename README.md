@@ -240,3 +240,11 @@ Main:checkPara makeshell dowork
 - author: 苑赞
 - 版本：1.0.9
 - Jun 19 2025
+
+## 更新版本
+```bash
+git add -A
+git commit -m "mes"
+git tag v1.1.0
+git push origin main
+```
