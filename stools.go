@@ -31,7 +31,7 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.1.0"))
+	fmt.Println(fmt.Sprintf("version: 1.1.2"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
@@ -114,23 +114,15 @@ func script_command(bin string, flags []string) {
 func run_cmd(command_line string) {
 	args := strings.Fields(command_line)
 
-	cmd := exec.Command(args[0], args[1:]...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+    cmd := exec.Command(args[0], args[1:]...)
+    cmd.Env = os.Environ()
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    cmd.Stdin = os.Stdin
 
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(string(stderr.Bytes()), err)
-	}
-	//log.Printf("Waiting for command to finish...")
-	// Start
-	err = cmd.Wait()
-	fmt.Println(string(stdout.Bytes()))
-
-	if err != nil {
-		log.Fatal(string(stderr.Bytes()), err)
-	}
+    if err := cmd.Run(); err != nil {
+        log.Fatal(err)
+    }
 }
 
 func rmtool(bin, toolname string) {
