@@ -245,6 +245,7 @@ Main:checkPara makeshell dowork
 ```bash
 git add -A
 git commit -m "mes"
-git tag v1.1.0
+git tag v1.1.1
 git push origin main
+git push origin v1.1.1
 ```
