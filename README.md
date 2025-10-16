@@ -238,5 +238,5 @@ Main:checkPara makeshell dowork
 ## 作者
 - yfinddream@gmail.com
 - author: 苑赞
-- 版本：1.0.0
+- 版本：1.0.9
 - Jun 19 2025

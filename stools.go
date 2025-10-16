@@ -14,20 +14,6 @@ import (
 	"strings"
 )
 
-func sortSprintMap(mapin map[string]string) string {
-	var sortMapOut string
-	keys := make([]string, len(mapin))
-	i := 0
-	for k := range mapin {
-		keys[i] = k
-		i++
-	}
-	sort.Strings(keys)
-	for _, k := range keys {
-		sortMapOut = fmt.Sprintf("%s\t%v\t%v\n", sortMapOut, k, mapin[k])
-	}
-	return sortMapOut
-}
 
 func samestringlen(inst string, lens int) string {
 	minus := lens - len(inst)
@@ -46,7 +32,7 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.0.8"))
+	fmt.Println(fmt.Sprintf("version: 1.0.9"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
@@ -69,17 +55,26 @@ func usage() {
 		os.Exit(1)
 	}
 	
-	// 解析 YAML
-	var tools map[string]string
-	err = yaml.Unmarshal(data, &tools)
+	// 解析 YAML 为 Node 以保持顺序
+	var node yaml.Node
+	err = yaml.Unmarshal(data, &node)
 	if err != nil {
 		fmt.Printf("Error parsing conf.yaml: %v\n", err)
 		os.Exit(1)
 	}
 	
-	// 打印工具信息
-	for tool, description := range tools {
-		fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 12), description))
+	// 打印工具信息（按 YAML 文件中的顺序）
+	if node.Kind == yaml.DocumentNode && len(node.Content) > 0 {
+		rootNode := node.Content[0]
+		if rootNode.Kind == yaml.MappingNode {
+			for i := 0; i < len(rootNode.Content); i += 2 {
+				if i+1 < len(rootNode.Content) {
+					tool := rootNode.Content[i].Value
+					description := rootNode.Content[i+1].Value
+					fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 21), description))
+				}
+			}
+		}
 	}
 	os.Exit(1)
 }
@@ -181,6 +176,12 @@ func rmtool(bin, toolname string) {
 }
 
 func addtool(bin, toolpath, description string) {
+
+	tool_file := filepath.Join(toolpath, "tool")
+	if _, err := os.Stat(tool_file); os.IsNotExist(err) {
+		log.Fatal("tool file not exists")
+	}
+
 	_, err := os.Stat(bin)
 	if os.IsNotExist(err) {
 		os.MkdirAll(bin, 0755)
