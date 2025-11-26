@@ -1,4 +1,4 @@
-module stools
+module github.com/seqyuan/stools
 
 go 1.21
 
