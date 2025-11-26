@@ -29,7 +29,7 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.1.5"))
+	fmt.Println(fmt.Sprintf("version: 1.1.6"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
