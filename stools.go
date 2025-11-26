@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -12,7 +11,6 @@ import (
 	"regexp"
 	"strings"
 )
-
 
 func samestringlen(inst string, lens int) string {
 	minus := lens - len(inst)
@@ -31,17 +29,17 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.1.3"))
+	fmt.Println(fmt.Sprintf("version: 1.1.4"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
-	
+
 	// 读取 conf.yaml 文件
 	file, _ := exec.LookPath(os.Args[0])
 	filepaths, _ := filepath.Abs(file)
 	bin := filepath.Dir(filepaths)
 	confPath := filepath.Join(bin, "conf.yaml")
-	
+
 	if _, err := os.Stat(confPath); os.IsNotExist(err) {
 		os.Exit(1)
 	}
@@ -53,7 +51,7 @@ func usage() {
 		fmt.Printf("Error reading conf.yaml: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	// 解析 YAML 为 Node 以保持顺序
 	var node yaml.Node
 	err = yaml.Unmarshal(data, &node)
@@ -61,7 +59,7 @@ func usage() {
 		fmt.Printf("Error parsing conf.yaml: %v\n", err)
 		os.Exit(1)
 	}
-	
+
 	// 打印工具信息（按 YAML 文件中的顺序）
 	if node.Kind == yaml.DocumentNode && len(node.Content) > 0 {
 		rootNode := node.Content[0]
@@ -114,52 +112,52 @@ func script_command(bin string, flags []string) {
 func run_cmd(command_line string) {
 	args := strings.Fields(command_line)
 
-    cmd := exec.Command(args[0], args[1:]...)
-    cmd.Env = os.Environ()
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-    cmd.Stdin = os.Stdin
+	cmd := exec.Command(args[0], args[1:]...)
+	cmd.Env = os.Environ()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
 
-    if err := cmd.Run(); err != nil {
-        log.Fatal(err)
-    }
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func rmtool(bin, toolname string) {
 	// 删除工具目录
 	os.RemoveAll(fmt.Sprintf("%s/module/%s", bin, toolname))
-	
+
 	// 从 conf.yaml 中删除工具及其描述
 	confPath := filepath.Join(bin, "conf.yaml")
-	
+
 	// 检查文件是否存在
 	if _, err := os.Stat(confPath); os.IsNotExist(err) {
 		// 文件不存在，直接返回
 		return
 	}
-	
+
 	// 读取现有的 conf.yaml 文件
 	data, err := os.ReadFile(confPath)
 	if err != nil {
 		log.Fatal("Error reading conf.yaml:", err)
 	}
-	
+
 	// 解析 YAML
 	var tools map[string]string
 	err = yaml.Unmarshal(data, &tools)
 	if err != nil {
 		log.Fatal("Error parsing conf.yaml:", err)
 	}
-	
+
 	// 删除指定工具
 	delete(tools, toolname)
-	
+
 	// 将更新后的内容写回文件
 	data, err = yaml.Marshal(tools)
 	if err != nil {
 		log.Fatal("Error marshaling yaml:", err)
 	}
-	
+
 	err = os.WriteFile(confPath, data, 0644)
 	if err != nil {
 		log.Fatal("Error writing conf.yaml:", err)
@@ -181,7 +179,7 @@ func addtool(bin, toolpath, description string) {
 	if os.IsNotExist(err) {
 		log.Fatal("toolpath not exists")
 	}
-	
+
 	_, err = os.Stat(fmt.Sprintf("%s/module", bin))
 	if os.IsNotExist(err) {
 		os.MkdirAll(fmt.Sprintf("%s/module", bin), 0755)
@@ -191,7 +189,7 @@ func addtool(bin, toolpath, description string) {
 	if _, err := os.Stat(fmt.Sprintf("%s/module/%s", bin, toolname)); err == nil {
 		os.RemoveAll(fmt.Sprintf("%s/module/%s", bin, toolname))
 	}
-	
+
 	cp_cmd := fmt.Sprintf("cp -rL %s %s/module/%s", toolpath, bin, toolname)
 	run_cmd(cp_cmd)
 
@@ -205,7 +203,7 @@ func addtool(bin, toolpath, description string) {
 	// 读取现有的 conf.yaml 文件
 	confPath := filepath.Join(bin, "conf.yaml")
 	var tools map[string]string
-	
+
 	// 检查文件是否存在
 	if _, err := os.Stat(confPath); err == nil {
 		// 文件存在，读取现有内容
@@ -213,7 +211,7 @@ func addtool(bin, toolpath, description string) {
 		if err != nil {
 			log.Fatal("Error reading conf.yaml:", err)
 		}
-		
+
 		err = yaml.Unmarshal(data, &tools)
 		if err != nil {
 			log.Fatal("Error parsing conf.yaml:", err)
@@ -222,16 +220,16 @@ func addtool(bin, toolpath, description string) {
 		// 文件不存在，创建新的 map
 		tools = make(map[string]string)
 	}
-	
+
 	// 添加新工具到 map 中
 	tools[toolname] = description
-	
+
 	// 将更新后的内容写回文件
 	data, err := yaml.Marshal(tools)
 	if err != nil {
 		log.Fatal("Error marshaling yaml:", err)
 	}
-	
+
 	err = os.WriteFile(confPath, data, 0644)
 	if err != nil {
 		log.Fatal("Error writing conf.yaml:", err)
@@ -246,7 +244,7 @@ func main() {
 		log.Fatal("Error getting absolute path:", err)
 	}
 	bin := filepath.Dir(filepaths)
-	
+
 	switch len(flag.Args()) {
 	case 0:
 		usage()
@@ -276,5 +274,3 @@ func main() {
 		script_command(bin, flag.Args())
 	}
 }
-
-
