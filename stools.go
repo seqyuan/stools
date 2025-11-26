@@ -68,7 +68,7 @@ func usage() {
 				if i+1 < len(rootNode.Content) {
 					tool := rootNode.Content[i].Value
 					description := rootNode.Content[i+1].Value
-					fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 23), description))
+					fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 26), description))
 				}
 			}
 		}
