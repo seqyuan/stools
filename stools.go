@@ -29,7 +29,7 @@ func checkErr(err error) {
 
 func usage() {
 	toolName := filepath.Base(os.Args[0])
-	fmt.Println(fmt.Sprintf("version: 1.1.4"))
+	fmt.Println(fmt.Sprintf("version: 1.1.5"))
 	fmt.Println(fmt.Sprintf("Usage:   %s  <tool> [parameters]", toolName))
 	fmt.Println(fmt.Sprintf("         %s  rm <toolname>", toolName))
 	fmt.Println(fmt.Sprintf("         %s  add <toolpath> <description>", toolName))
@@ -68,7 +68,7 @@ func usage() {
 				if i+1 < len(rootNode.Content) {
 					tool := rootNode.Content[i].Value
 					description := rootNode.Content[i+1].Value
-					fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 21), description))
+					fmt.Println(fmt.Sprintf("\t%s\t%s", samestringlen(tool, 23), description))
 				}
 			}
 		}
